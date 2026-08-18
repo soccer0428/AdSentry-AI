@@ -1,0 +1,59 @@
+import csv
+
+danger_words = {
+    "free": 15,
+    "download": 20,
+    "bonus": 10,
+    "gift": 10,
+    "win": 15,
+    "prize": 15,
+    "urgent": 20,
+    "claim": 10,
+    "verify": 15,
+    "reward": 10,
+}
+
+def predict_url(url):
+    url = url.lower()
+
+    score = 0
+
+    for word, points in danger_words.items():
+        if word in url:
+            score += points
+
+    score = min(score, 100)
+
+    if score >= 20:
+        return "danger"
+    else:
+        return "safe"
+
+total = 0
+correct = 0
+
+with open("urls.csv", newline="", encoding="utf-8") as file:
+    reader = csv.DictReader(file)
+
+    for row in reader:
+        url = row["url"]
+        actual = row["label"]
+
+        prediction = predict_url(url)
+
+        total += 1
+
+        if prediction == actual:
+            correct += 1
+
+        print(f"https://gamerch.com/topics/article/1925URL: {url}")
+        print(f"正解: {actual}")
+        print(f"予測: {prediction}")
+        print("-" * 40)
+
+accuracy = (correct / total) * 100
+
+print("\n===== 実験結果 =====")
+print(f"総件数: {total}")
+print(f"正解数: {correct}")
+print(f"正答率: {accuracy:.2f}%")
